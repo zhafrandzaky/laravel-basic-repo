@@ -1,58 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# laravel-basic-repo
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Proyek Laravel 13 sederhana yang mengimplementasikan CRUD lengkap untuk entitas **Product**, menggunakan **PostgreSQL** sebagai database.
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **PHP** ^8.3
+- **Laravel** ^13.0
+- **PostgreSQL** (local)
+- **Tailwind CSS** v4 via Vite
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Struktur Tambahan
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   └── ProductController.php   # 4 fungsi: index, store, update, destroy
+│   └── Requests/
+│       ├── StoreProductRequest.php  # validasi form tambah
+│       └── UpdateProductRequest.php # validasi form ubah
+├── Models/
+│   └── Product.php
+└── Services/
+    └── ProductService.php           # logika create / update / delete
 
-## Learning Laravel
+database/
+└── migrations/
+    └── 2026_04_18_000003_create_products_table.php
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+resources/views/
+└── products/
+    └── index.blade.php              # halaman CRUD satu halaman
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+tests/Feature/
+└── ProductCrudTest.php              # 5 test: render, create, validasi, update, delete
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Fitur
 
-## Contributing
+- **Tambah produk** — Form Request (`StoreProductRequest`) dengan validasi `name`, `description`, `price`, `stock`
+- **Tampilkan produk** — Tabel daftar semua produk di sisi kanan halaman
+- **Ubah produk** — Form edit muncul inline saat klik tombol **Ubah**
+- **Hapus produk** — Konfirmasi browser sebelum delete
+- **Service layer** — `ProductService` menangani operasi database, controller hanya mendelegasikan
+- **Error handling** — `try/catch` di setiap aksi controller; error dicatat via `Log::error` dan flash message ditampilkan ke user
+- **Flash messages** — Notifikasi sukses/gagal setelah setiap aksi
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Setup
 
-## Code of Conduct
+### Prasyarat
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- PHP ^8.3 dengan ekstensi `pdo_pgsql`
+- PostgreSQL (lokal)
+- Node.js & npm
+- Composer
 
-## Security Vulnerabilities
+### Instalasi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# 1. Clone repo
+git clone https://github.com/zhafrandzaky/laravel-basic-repo.git
+cd laravel-basic-repo
+
+# 2. Install dependencies
+composer install
+npm install
+
+# 3. Salin environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Buat database PostgreSQL
+psql -U <user> -d postgres -c "CREATE DATABASE laravel_basic;"
+
+# 5. Sesuaikan .env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=laravel_basic
+DB_USERNAME=<user>
+DB_PASSWORD=
+
+# 6. Jalankan migration
+php artisan migrate
+
+# 7. Build asset (opsional, untuk tampilan Tailwind)
+npm run build
+```
+
+### Menjalankan Server
+
+```bash
+php artisan serve
+```
+
+Buka [http://localhost:8000/products](http://localhost:8000/products).
+
+## Testing
+
+```bash
+# Buat database test terlebih dahulu
+psql -U <user> -d postgres -c "CREATE DATABASE laravel_basic_test;"
+
+# Jalankan semua test
+php artisan test
+
+# Atau hanya test CRUD produk
+php artisan test --filter=ProductCrudTest
+```
+
+Konfigurasi test menggunakan database `laravel_basic_test` (didefinisikan di `phpunit.xml`).
+
+## Screenshots
+
+### Halaman Utama — Daftar & Tambah Produk
+![Halaman utama](screenshots/index.png)
+
+### Form Ubah Produk
+![Form ubah produk](screenshots/edit.png)
+
+### Validasi Error
+![Validasi error](screenshots/validation.png)
+
+## Test Manual
+
+Setelah server berjalan, buka browser ke [http://localhost:8000/products](http://localhost:8000/products).
+
+| Aksi | Cara |
+|---|---|
+| **Tambah produk** | Isi form di kiri → klik **Simpan Produk** |
+| **Validasi error** | Kirim form kosong atau harga/stok negatif → pesan error muncul di bawah field |
+| **Lihat daftar** | Tabel di kanan menampilkan semua produk secara otomatis |
+| **Ubah produk** | Klik **Ubah** di baris produk → form edit muncul di atas tabel |
+| **Hapus produk** | Klik **Hapus** → muncul konfirmasi browser sebelum data dihapus |
+| **Flash message** | Notifikasi hijau (sukses) atau merah (gagal) muncul di atas halaman setelah setiap aksi |
+
+## Routes
+
+| Method | URI                   | Action    | Name               |
+| ------ | --------------------- | --------- | ------------------ |
+| GET    | `/products`           | `index`   | `products.index`   |
+| POST   | `/products`           | `store`   | `products.store`   |
+| PUT    | `/products/{product}` | `update`  | `products.update`  |
+| DELETE | `/products/{product}` | `destroy` | `products.destroy` |
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[MIT](https://opensource.org/licenses/MIT)

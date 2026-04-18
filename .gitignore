@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.*.local
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -18,8 +19,20 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/app/private
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+/storage/logs
 /vendor
 _ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+npm-debug.log*
+yarn-error.log
+
+# screenshots — simpan file PNG di sini, jangan push placeholder kosong
+/screenshots/*.gitkeep
